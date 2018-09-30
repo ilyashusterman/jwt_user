@@ -14,39 +14,11 @@ class UserJSONWebTokenAuthentication(object):
 		self.valid_user_fields = VALID_USER_FIELDS
 		self.exclude_fields = EXCLUDE_USER_FIELDS
 
-	def get_validated_token(self, header_value):
-		header_prefix = self.get_header_prefix()
-		auth = header_value.split(header_prefix)
-		if len(auth) == 1:
-			msg = 'Invalid Authorization header. No credentials provided.'
-			raise Exception(msg)
-		elif len(auth) > 2:
-			msg = 'Invalid Authorization header. Credentials string should ' \
-			      'not contain spaces.'
-			raise Exception(msg)
-		return auth[1]
-
 	def get_header_prefix(self):
 		return '{} '.format(DEFAULTS['JWT_AUTH_HEADER_PREFIX'])
 
-	def get_jwt_value(self, request):
-		return self.get_validated_token(request.headers[DEFAULTS['JWT_AUTH_HEADER']])
-
-	def authenticate(self, request):
-		jwt_value = self.get_jwt_value(request)
-		if jwt_value is None:
-			return None
-		jwt_decoded_payload = self.get_checked_decoded(jwt_value)
-		if not self.valid_user_fields.issubset(jwt_decoded_payload.keys()):
-			msg = 'Invalid user attributes {}'.format(
-				set(jwt_decoded_payload.keys())-self.valid_user_fields)
-			raise Exception(msg)
-		user = self.get_user_from_payload(jwt_decoded_payload)
-		return user, jwt_value
-
 	def jwt_decode_payload(self, token):
 		secret_key = DEFAULTS['JWT_SECRET_KEY']
-		print('token={}'.format(token))
 		return jwt.decode(
 			token,
 			None or secret_key,
@@ -67,6 +39,21 @@ class UserJSONWebTokenAuthentication(object):
 			DEFAULTS['JWT_ALGORITHM'],
 		).decode('utf-8')
 
+	def get_validated_token(self, header_value):
+		header_prefix = self.get_header_prefix()
+		auth = header_value.split(header_prefix)
+		if len(auth) == 1:
+			msg = 'Invalid Authorization header. No credentials provided.'
+			raise Exception(msg)
+		elif len(auth) > 2:
+			msg = 'Invalid Authorization header. Credentials string should ' \
+			      'not contain spaces.'
+			raise Exception(msg)
+		return auth[1]
+
+	def get_jwt_value(self, request):
+		return self.get_validated_token(request.headers[DEFAULTS['JWT_AUTH_HEADER']])
+
 	def get_checked_decoded(self, jwt_value):
 		try:
 			decoded = self.jwt_decode_payload(jwt_value)
@@ -79,6 +66,18 @@ class UserJSONWebTokenAuthentication(object):
 			raise Exception(msg)
 		except jwt.InvalidTokenError:
 			raise Exception()
+
+	def authenticate(self, request):
+		jwt_value = self.get_jwt_value(request)
+		if jwt_value is None:
+			return None
+		jwt_decoded_payload = self.get_checked_decoded(jwt_value)
+		if not self.valid_user_fields.issubset(jwt_decoded_payload.keys()):
+			msg = 'Invalid user attributes {}'.format(
+				set(jwt_decoded_payload.keys())-self.valid_user_fields)
+			raise Exception(msg)
+		user = self.get_user_from_payload(jwt_decoded_payload)
+		return user, jwt_value
 
 	def get_user_from_payload(self, user_decoded_payload):
 		map(user_decoded_payload.__delitem__,
