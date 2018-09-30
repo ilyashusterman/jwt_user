@@ -18,4 +18,4 @@ DEFAULTS = {
 }
 
 VALID_USER_FIELDS = {'username', 'user_id'}
-EXCLUDE_USER_FIELDS = {}
+EXCLUDE_USER_FIELDS = set()

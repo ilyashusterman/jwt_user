@@ -4,7 +4,8 @@ from unittest import TestCase, skip
 from bunch import Bunch
 
 from settings import DEFAULTS
-from user_authorization import UserJSONWebTokenAuthentication
+from user_authorization import UserJSONWebTokenAuthentication, get_jwt_user, \
+	set_user_exclude_fields, set_user_valid_fields
 
 
 class TestUserJSONWebTokenAuthentication(TestCase):
@@ -13,11 +14,17 @@ class TestUserJSONWebTokenAuthentication(TestCase):
 		self.payload = {
 			'user_id': 'test',
 			'username': 'test',
-			# 'email': 'test@email.com'
 		}
+		set_user_exclude_fields(set())
 		self.token = self.validator.jwt_encode_payload(self.payload)
-		self.user_values = {'username', 'user_id', 'exp'}
+		self.user_values = {'username', 'user_id', 'token'}
 
+	def generate_user_request(self, token=None):
+		token = self.token if token is None else token
+		request = Bunch()
+		request.headers = {
+			DEFAULTS['JWT_AUTH_HEADER']: 'JWT {}'.format(token)}
+		return request
 
 	def test_header_valdiation(self):
 		jwt_value = self.validator.get_validated_token('{} {}'.format(
@@ -42,8 +49,24 @@ class TestUserJSONWebTokenAuthentication(TestCase):
 		self.assertEqual('test@email.com', decoded['username'])
 
 	def test_request_jwt_user_authenticate(self):
-		request = Bunch()
-		token_encoded = self.validator.jwt_encode_payload(self.payload)
-		request.headers = {DEFAULTS['JWT_AUTH_HEADER']: 'JWT {}'.format(token_encoded)}
-		user = UserJSONWebTokenAuthentication().authenticate(request)[0]
-		self.assertSetEqual(set(user.keys()), self.user_values)
+		request = self.generate_user_request()
+		user = get_jwt_user(request)
+		self.assertSetEqual(set(user.keys()), self.user_values, msg=user.keys())
+
+	def test_change_user_exclude_fields(self):
+		request = self.generate_user_request()
+		set_user_exclude_fields({'username'})
+		user = get_jwt_user(request)
+		self.assertNotIn('username', user.keys())
+
+	def test_change_user_valid_fields(self):
+		test_field = 'test_field'
+		self.payload.update({
+			test_field: 'test'
+		})
+		self.token = self.validator.jwt_encode_payload(self.payload)
+		user_valid_fields = {'username', 'user_id', test_field, 'token'}
+		set_user_valid_fields(user_valid_fields)
+		user_request = self.generate_user_request(self.token)
+		user = get_jwt_user(user_request)
+		self.assertSetEqual(user_valid_fields, set(user.keys()))

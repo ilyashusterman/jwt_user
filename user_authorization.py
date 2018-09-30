@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import jwt
 from bunch import Bunch
 
@@ -7,12 +8,13 @@ from settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
 
 class UserJSONWebTokenAuthentication(object):
 
+	valid_user_fields = VALID_USER_FIELDS
+	exclude_fields = EXCLUDE_USER_FIELDS
+
 	def __init__(self):
 		self.options = {
 			'exp':  datetime.utcnow() + DEFAULTS['JWT_EXPIRATION_DELTA'],
 		}
-		self.valid_user_fields = VALID_USER_FIELDS
-		self.exclude_fields = EXCLUDE_USER_FIELDS
 
 	def get_header_prefix(self):
 		return '{} '.format(DEFAULTS['JWT_AUTH_HEADER_PREFIX'])
@@ -67,12 +69,16 @@ class UserJSONWebTokenAuthentication(object):
 		except jwt.InvalidTokenError:
 			raise Exception()
 
+	def get_user_valid_fields(self):
+		return self.valid_user_fields.union(self.options.keys()).union(set('token'))
+
 	def authenticate(self, request):
 		jwt_value = self.get_jwt_value(request)
 		if jwt_value is None:
 			return None
 		jwt_decoded_payload = self.get_checked_decoded(jwt_value)
-		if not self.valid_user_fields.issubset(jwt_decoded_payload.keys()):
+		user_valid_fields = self.get_user_valid_fields()
+		if not set(jwt_decoded_payload.keys()).issubset(user_valid_fields):
 			msg = 'Invalid user attributes {}'.format(
 				set(jwt_decoded_payload.keys())-self.valid_user_fields)
 			raise Exception(msg)
@@ -80,8 +86,8 @@ class UserJSONWebTokenAuthentication(object):
 		return user, jwt_value
 
 	def get_user_from_payload(self, user_decoded_payload):
-		map(user_decoded_payload.__delitem__,
-			filter(user_decoded_payload.__contains__, self.exclude_fields))
+		exclude_user_fields = list(filter(user_decoded_payload.__contains__, self.exclude_fields.union(self.options.keys())))
+		list(map(user_decoded_payload.__delitem__, exclude_user_fields))
 		return Bunch(user_decoded_payload)
 
 
@@ -100,3 +106,11 @@ def get_jwt_user(request):
 	if user is None:
 		raise Exception('Unauthorized token request')
 	return user
+
+
+def set_user_valid_fields(valid_user_fields):
+	UserJSONWebTokenAuthentication.valid_user_fields = valid_user_fields
+
+
+def set_user_exclude_fields(exclude_fields):
+	UserJSONWebTokenAuthentication.exclude_fields = exclude_fields
