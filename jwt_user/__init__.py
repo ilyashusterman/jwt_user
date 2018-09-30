@@ -5,7 +5,7 @@ from jwt_user.UserAuthorization import UserJSONWebTokenAuthorization
 
 def authorize_token_from_request(request):
 	user = None
-	user_jwt = UserJSONWebTokenAuthorization().authenticate(request)
+	user_jwt = UserJSONWebTokenAuthorization().authorize(request)
 	if user_jwt is not None:
 		user = user_jwt[0]
 		user.token = user_jwt[1]

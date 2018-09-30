@@ -72,7 +72,7 @@ class UserJSONWebTokenAuthorization(object):
 	def get_user_valid_fields(self):
 		return self.valid_user_fields.union(self.options.keys()).union(set('token'))
 
-	def authenticate(self, request):
+	def authorize(self, request):
 		jwt_value = self.get_jwt_value(request)
 		if jwt_value is None:
 			return None
