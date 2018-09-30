@@ -20,4 +20,4 @@ test:
 	$(VERBOSE) nosetests test/test_user_authorization.py
 .PHONY: smoke
 smoke:
-	$(VERBOSE) nosetests /
+	$(VERBOSE) nosetests

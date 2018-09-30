@@ -19,7 +19,7 @@ class UserJSONWebTokenAuthentication(object):
 	def get_header_prefix(self):
 		return '{} '.format(DEFAULTS['JWT_AUTH_HEADER_PREFIX'])
 
-	def jwt_decode_payload(self, token):
+	def decode_user_token(self, token):
 		secret_key = DEFAULTS['JWT_SECRET_KEY']
 		return jwt.decode(
 			token,
@@ -32,11 +32,11 @@ class UserJSONWebTokenAuthentication(object):
 			algorithms=[DEFAULTS['JWT_ALGORITHM']]
 		)
 
-	def jwt_encode_payload(self, payload):
+	def generate_user_token(self, user_payload):
 		secret_key = DEFAULTS['JWT_SECRET_KEY']
-		payload.update(self.options)
+		user_payload.update(self.options)
 		return jwt.encode(
-			payload,
+			user_payload,
 			secret_key,
 			DEFAULTS['JWT_ALGORITHM'],
 		).decode('utf-8')
@@ -58,7 +58,7 @@ class UserJSONWebTokenAuthentication(object):
 
 	def get_checked_decoded(self, jwt_value):
 		try:
-			decoded = self.jwt_decode_payload(jwt_value)
+			decoded = self.decode_user_token(jwt_value)
 			return decoded
 		except jwt.ExpiredSignature:
 			msg = 'Signature has expired.'
@@ -86,7 +86,9 @@ class UserJSONWebTokenAuthentication(object):
 		return user, jwt_value
 
 	def get_user_from_payload(self, user_decoded_payload):
-		exclude_user_fields = list(filter(user_decoded_payload.__contains__, self.exclude_fields.union(self.options.keys())))
+		exclude_fields = self.exclude_fields.union(self.options.keys())
+		exclude_user_fields = list(
+			filter(user_decoded_payload.__contains__, exclude_fields))
 		list(map(user_decoded_payload.__delitem__, exclude_user_fields))
 		return Bunch(user_decoded_payload)
 

@@ -16,7 +16,7 @@ class TestUserJSONWebTokenAuthentication(TestCase):
 			'username': 'test',
 		}
 		set_user_exclude_fields(set())
-		self.token = self.validator.jwt_encode_payload(self.payload)
+		self.token = self.validator.generate_user_token(self.payload)
 		self.user_values = {'username', 'user_id', 'token'}
 
 	def generate_user_request(self, token=None):
@@ -33,14 +33,14 @@ class TestUserJSONWebTokenAuthentication(TestCase):
 		self.assertEqual(self.token, jwt_value)
 
 	def test_decode_jwt(self):
-		token_encoded = self.validator.jwt_encode_payload(self.payload)
+		token_encoded = self.validator.generate_user_token(self.payload)
 		decoded = self.validator.get_checked_decoded(jwt_value=token_encoded)
 		self.assertEqual(decoded, self.payload)
 
 	def test_decode_jwt_expired(self):
 		self.payload['exp'] = datetime.utcnow() - DEFAULTS['JWT_EXPIRATION_DELTA']
 		with self.assertRaises(Exception) as e:
-			self.validator.jwt_encode_payload(self.payload)
+			self.validator.generate_user_token(self.payload)
 			self.assertIn('Signature has expired', e)
 
 	@skip('due to token expire could not run this')
@@ -64,7 +64,7 @@ class TestUserJSONWebTokenAuthentication(TestCase):
 		self.payload.update({
 			test_field: 'test'
 		})
-		self.token = self.validator.jwt_encode_payload(self.payload)
+		self.token = self.validator.generate_user_token(self.payload)
 		user_valid_fields = {'username', 'user_id', test_field, 'token'}
 		set_user_valid_fields(user_valid_fields)
 		user_request = self.generate_user_request(self.token)
