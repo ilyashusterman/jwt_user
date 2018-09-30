@@ -1,0 +1,21 @@
+import os
+from datetime import timedelta
+
+DEFAULTS = {
+	'JWT_PRIVATE_KEY': os.environ.get('JWT_SECRET_KEY', 'test_secret'),
+	'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', 'test_secret'),
+	'JWT_ALGORITHM': 'HS256',
+	'JWT_VERIFY': True,
+	'JWT_VERIFY_EXPIRATION': True,
+	'JWT_LEEWAY': 0,
+	'JWT_EXPIRATION_DELTA': timedelta(seconds=500),
+	'JWT_AUDIENCE': None,
+	'JWT_ISSUER': None,
+	'JWT_ALLOW_REFRESH': False,
+	'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+	'JWT_AUTH_HEADER_PREFIX': 'JWT',
+	'JWT_AUTH_HEADER': 'Authorization'
+}
+
+VALID_USER_FIELDS = {'username', 'user_id'}
+EXCLUDE_USER_FIELDS = {}
