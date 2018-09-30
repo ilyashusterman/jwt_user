@@ -3,10 +3,10 @@ from datetime import datetime
 import jwt
 from bunch import Bunch
 
-from settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
+from jwt_user.settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
 
 
-class UserJSONWebTokenAuthentication(object):
+class UserJSONWebTokenAuthorization(object):
 
 	valid_user_fields = VALID_USER_FIELDS
 	exclude_fields = EXCLUDE_USER_FIELDS
@@ -92,27 +92,3 @@ class UserJSONWebTokenAuthentication(object):
 		list(map(user_decoded_payload.__delitem__, exclude_user_fields))
 		return Bunch(user_decoded_payload)
 
-
-def authorize_token_from_request(request):
-	user = None
-	user_jwt = UserJSONWebTokenAuthentication().authenticate(request)
-	if user_jwt is not None:
-		user = user_jwt[0]
-		user.token = user_jwt[1]
-
-	return user
-
-
-def get_jwt_user(request):
-	user = authorize_token_from_request(request)
-	if user is None:
-		raise Exception('Unauthorized token request')
-	return user
-
-
-def set_user_valid_fields(valid_user_fields):
-	UserJSONWebTokenAuthentication.valid_user_fields = valid_user_fields
-
-
-def set_user_exclude_fields(exclude_fields):
-	UserJSONWebTokenAuthentication.exclude_fields = exclude_fields

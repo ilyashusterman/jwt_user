@@ -1,9 +1,10 @@
 import os
+import uuid
 from datetime import timedelta
 
 DEFAULTS = {
-	'JWT_PRIVATE_KEY': os.environ.get('JWT_SECRET_KEY', 'test_secret'),
-	'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', 'test_secret'),
+	'JWT_PRIVATE_KEY': os.environ.get('JWT_SECRET_KEY', uuid.uuid4().hex),
+	'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', uuid.uuid4().hex),
 	'JWT_ALGORITHM': 'HS256',
 	'JWT_VERIFY': True,
 	'JWT_VERIFY_EXPIRATION': True,
