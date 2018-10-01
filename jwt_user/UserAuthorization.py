@@ -7,15 +7,15 @@ from jwt_user.settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
 
 
 class UserAuthorization(object):
-	DEFAULT_FIELDS = set('token')
-	valid_user_fields = VALID_USER_FIELDS
+	DEFAULT_FIELDS = {'token'}
+	default_user_valid_fields = VALID_USER_FIELDS
 	exclude_fields = EXCLUDE_USER_FIELDS
 
 	def __init__(self):
 		self.options = {
 			'exp':  datetime.utcnow() + DEFAULTS['JWT_EXPIRATION_DELTA'],
 		}
-		self.user_valid_fields = self.get_user_valid_fields()
+
 
 	def get_header_prefix(self):
 		return '{} '.format(DEFAULTS['JWT_AUTH_HEADER_PREFIX'])
@@ -54,9 +54,10 @@ class UserAuthorization(object):
 			raise Exception(msg)
 		return auth[1]
 
-	def request_is_valid(self, request):
-		return hasattr(request, 'headers') and \
-		       DEFAULTS['JWT_AUTH_HEADER'] in request.headers
+	@staticmethod
+	def request_is_valid(request):
+		return hasattr(request, 'headers') and DEFAULTS[
+			'JWT_AUTH_HEADER'] in request.headers
 
 	def get_jwt_value(self, request):
 		if self.request_is_valid(request):
@@ -77,8 +78,10 @@ class UserAuthorization(object):
 		except jwt.InvalidTokenError:
 			raise Exception()
 
-	def get_user_valid_fields(self):
-		return self.valid_user_fields.union(self.options.keys()).union(self.DEFAULT_FIELDS)
+	@property
+	def user_valid_fields(self):
+		return self.default_user_valid_fields.union(self.options.keys()).union(
+			self.DEFAULT_FIELDS)
 
 	def authorize(self, request):
 		jwt_value = self.get_jwt_value(request)
@@ -87,8 +90,10 @@ class UserAuthorization(object):
 		jwt_decoded_payload = self.get_checked_decoded(jwt_value)
 		if not set(jwt_decoded_payload.keys()).issubset(self.user_valid_fields):
 			invalid_attributes = \
-				set(jwt_decoded_payload.keys())-self.valid_user_fields
+				set(jwt_decoded_payload.keys())-self.user_valid_fields
 			msg = 'Invalid user attributes {}'.format(invalid_attributes)
+			print('self.valid_user_fields={}'.format(self.user_valid_fields))
+			print('jwt_decoded_payload.keys()={}'.format(jwt_decoded_payload.keys()))
 			raise Exception(msg)
 		user = self.get_user_from_payload(jwt_decoded_payload)
 		return user, jwt_value
