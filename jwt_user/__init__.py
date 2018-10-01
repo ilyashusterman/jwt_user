@@ -31,7 +31,6 @@ def get_jwt_user(request):
 
 def set_user_valid_fields(valid_user_fields):
 	get_user_authorization().default_user_valid_fields = valid_user_fields
-	print('get_user_authorization().default_user_valid_fields={}'.format(get_user_authorization().default_user_valid_fields))
 
 
 def set_user_exclude_fields(exclude_fields):

@@ -92,8 +92,6 @@ class UserAuthorization(object):
 			invalid_attributes = \
 				set(jwt_decoded_payload.keys())-self.user_valid_fields
 			msg = 'Invalid user attributes {}'.format(invalid_attributes)
-			print('self.valid_user_fields={}'.format(self.user_valid_fields))
-			print('jwt_decoded_payload.keys()={}'.format(jwt_decoded_payload.keys()))
 			raise Exception(msg)
 		user = self.get_user_from_payload(jwt_decoded_payload)
 		return user, jwt_value
