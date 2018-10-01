@@ -1,8 +1,8 @@
 from datetime import datetime
 
 import jwt
-from bunch import Bunch
 
+from jwt_user.User import User
 from jwt_user.settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
 
 
@@ -90,5 +90,5 @@ class UserAuthorization(object):
 		exclude_user_fields = list(
 			filter(user_decoded_payload.__contains__, exclude_fields))
 		list(map(user_decoded_payload.__delitem__, exclude_user_fields))
-		return Bunch(user_decoded_payload)
+		return User(user_decoded_payload)
 

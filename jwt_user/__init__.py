@@ -1,5 +1,6 @@
 from functools import wraps
 
+from jwt_user.Request import Request
 from jwt_user.UserAuthorization import UserAuthorization
 
 
@@ -39,6 +40,19 @@ def authorized_user(f):
 		if user is not None:
 			return f(*args, **kwds)
 		else:
-			request = list(request)
-			raise Exception('Unauthorized user request {}'.format(request))
+			raise Exception('Unauthorized user request {}'.format(request.headers))
 	return check_user
+
+
+def generate_token(payload):
+	return UserAuthorization().generate_user_token(payload)
+
+
+def decode_token(token):
+	return UserAuthorization().get_checked_decoded(token)
+
+
+def generate_request(token):
+	request = Request()
+	request.set_authorize_token(token)
+	return request

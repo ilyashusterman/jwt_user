@@ -34,7 +34,7 @@ setup(
     ],
     keywords='sample setuptools development',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    install_requires=['PyJWT', 'bunch'],
+    install_requires=['PyJWT', 'bunch', 'six'],
     project_urls={
         'Bug Reports': 'https://github.com/ilyashusterman/jwt_user/issues',
         'Funding': 'https://donate.pypi.org',

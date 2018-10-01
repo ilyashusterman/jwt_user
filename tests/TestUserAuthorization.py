@@ -1,10 +1,10 @@
 from datetime import datetime
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from bunch import Bunch
 
 from jwt_user import set_user_exclude_fields, get_jwt_user, \
-	set_user_valid_fields, authorized_user
+	set_user_valid_fields, authorized_user, generate_request
 from jwt_user.settings import DEFAULTS
 from jwt_user.UserAuthorization import UserAuthorization
 
@@ -22,9 +22,7 @@ class TestUserAuthorization(TestCase):
 
 	def generate_user_request(self, token=None):
 		token = self.token if token is None else token
-		request = Bunch()
-		request.headers = {
-			DEFAULTS['JWT_AUTH_HEADER']: 'JWT {}'.format(token)}
+		request = generate_request(token)
 		return request
 
 	def test_header_valdiation(self):
@@ -44,10 +42,9 @@ class TestUserAuthorization(TestCase):
 			self.jwt_user.generate_user_token(self.payload)
 			self.assertIn('Signature has expired', e)
 
-	@skip('due to token expire could not run this')
 	def test_decode_jwt_from_server(self):
 		decoded = self.jwt_user.get_checked_decoded(jwt_value=self.token)
-		self.assertEqual('test@email.com', decoded['username'])
+		self.assertEqual('test', decoded['username'])
 
 	def test_request_jwt_user_authenticate(self):
 		request = self.generate_user_request()
