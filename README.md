@@ -29,15 +29,18 @@ Usage
     >>> import tornado
     >>> BaseRequestHandler = tornado.web.RequestHandler
     >>> class MainHandler(BaseRequestHandler):
-    >>> @authorized_user
-    >>> def get(self):
-    >>>     self.write("Hello, Authorized user")
+    ...     @jwt_user.authorized_user
+    ...     def get(self):
+    ...         self.write('Hello, Authorized user')
+    ...
+    >>>
     >>> def make_app():
-    >>>     user_valid_fields = {'username', 'user_id', 'test_field', 'token'}
-	>>>     jwt_user.set_user_valid_fields(user_valid_fields)
-	>>>     application = tornado.web.Application([
-    >>>     (r"/", MainHandler)])
-    >>>     return application
+    ...     user_valid_fields = {'username', 'user_id', 'test_field', 'token'}
+	...     jwt_user.set_user_valid_fields(user_valid_fields)
+	...     application = tornado.web.Application([
+    ...     (r"/", MainHandler)])
+    ...     return application
+    >>>
 ],
         
 Documentation
