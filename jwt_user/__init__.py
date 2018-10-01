@@ -15,15 +15,33 @@ def get_user_authorization():
 def authorize_token_from_request(request):
 	user = None
 	user_jwt = get_user_authorization().authorize(request)
+	user = set_user_if_valid(user, user_jwt)
+	return user
+
+
+def authorize_token_from_headers(headers):
+	user = None
+	user_jwt = get_user_authorization().authorize_headers(headers)
+	user = set_user_if_valid(user, user_jwt)
+	return user
+
+
+def set_user_if_valid(user, user_jwt):
 	if user_jwt is not None:
 		user = user_jwt[0]
 		user.token = user_jwt[1]
-
 	return user
 
 
 def get_jwt_user(request):
 	user = authorize_token_from_request(request)
+	if user is None:
+		raise Exception('Unauthorized token request')
+	return user
+
+
+def get_jwt_user_headers(headers):
+	user = authorize_token_from_headers(headers)
 	if user is None:
 		raise Exception('Unauthorized token request')
 	return user

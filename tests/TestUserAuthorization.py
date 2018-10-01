@@ -59,7 +59,7 @@ class TestUserAuthorization(TestCase):
 
 	def test_unvalid_request(self):
 		request = Request()
-		with self.assertRaisesRegex(Exception, 'Request not valid'):
+		with self.assertRaisesRegex(Exception, 'Request headers are not valid'):
 			get_jwt_user(request)
 
 	def test_change_user_valid_fields(self):
