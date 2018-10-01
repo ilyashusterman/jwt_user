@@ -1,7 +1,8 @@
 jwt_user
 =====
 
-A Python implementation of acquiring user from jwt token 
+A Python implementation of acquiring, authorizing user from jwt token.
+designed to work for any request entity from flask,django,tornado frameworks. 
 
 Installing
 ----------
