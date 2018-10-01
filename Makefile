@@ -17,7 +17,7 @@ endif
 
 .PHONY: test
 test:
-	$(VERBOSE) nosetests test/test_user_authorization.py
+	$(VERBOSE) nosetests tests/TestUserAuthorization.py
 .PHONY: smoke
 smoke:
 	$(VERBOSE) nosetests

@@ -88,6 +88,7 @@ class TestUserAuthorization(TestCase):
 		self.assertEqual(user_test.authorize_test_user(), 'passed')
 
 	def test_decorator_non_authorize_user(self):
+		"""should fail for python2 because of assertRaisesRegex"""
 		_self = self
 
 		class UserTest(object):

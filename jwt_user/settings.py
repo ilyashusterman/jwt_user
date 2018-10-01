@@ -3,13 +3,13 @@ import uuid
 from datetime import timedelta
 
 DEFAULTS = {
-	'JWT_PRIVATE_KEY': os.environ.get('JWT_SECRET_KEY', uuid.uuid4().hex),
+	'JWT_PRIVATE_KEY': os.environ.get('JWT_PRIVATE_KEY', uuid.uuid4().hex),
 	'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', uuid.uuid4().hex),
 	'JWT_ALGORITHM': 'HS256',
 	'JWT_VERIFY': True,
 	'JWT_VERIFY_EXPIRATION': True,
 	'JWT_LEEWAY': 0,
-	'JWT_EXPIRATION_DELTA': timedelta(seconds=500),
+	'JWT_EXPIRATION_DELTA': timedelta(seconds=3600),
 	'JWT_AUDIENCE': None,
 	'JWT_ISSUER': None,
 	'JWT_ALLOW_REFRESH': False,
