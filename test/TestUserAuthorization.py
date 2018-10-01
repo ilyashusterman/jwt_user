@@ -6,12 +6,12 @@ from bunch import Bunch
 from jwt_user import set_user_exclude_fields, get_jwt_user, \
 	set_user_valid_fields, authorized_user
 from jwt_user.settings import DEFAULTS
-from jwt_user.UserAuthorization import UserJSONWebTokenAuthorization
+from jwt_user.UserAuthorization import UserAuthorization
 
 
-class TestUserJSONWebTokenAuthorization(TestCase):
+class TestUserAuthorization(TestCase):
 	def setUp(self):
-		self.jwt_user = UserJSONWebTokenAuthorization()
+		self.jwt_user = UserAuthorization()
 		self.payload = {
 			'user_id': 'test',
 			'username': 'test',

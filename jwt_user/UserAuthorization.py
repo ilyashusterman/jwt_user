@@ -6,7 +6,7 @@ from bunch import Bunch
 from jwt_user.settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
 
 
-class UserJSONWebTokenAuthorization(object):
+class UserAuthorization(object):
 	DEFAULT_FIELDS = set('token')
 	valid_user_fields = VALID_USER_FIELDS
 	exclude_fields = EXCLUDE_USER_FIELDS

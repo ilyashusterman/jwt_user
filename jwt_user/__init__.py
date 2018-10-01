@@ -1,11 +1,11 @@
 from functools import wraps
 
-from jwt_user.UserAuthorization import UserJSONWebTokenAuthorization
+from jwt_user.UserAuthorization import UserAuthorization
 
 
 def authorize_token_from_request(request):
 	user = None
-	user_jwt = UserJSONWebTokenAuthorization().authorize(request)
+	user_jwt = UserAuthorization().authorize(request)
 	if user_jwt is not None:
 		user = user_jwt[0]
 		user.token = user_jwt[1]
@@ -21,11 +21,11 @@ def get_jwt_user(request):
 
 
 def set_user_valid_fields(valid_user_fields):
-	UserJSONWebTokenAuthorization.valid_user_fields = valid_user_fields
+	UserAuthorization.valid_user_fields = valid_user_fields
 
 
 def set_user_exclude_fields(exclude_fields):
-	UserJSONWebTokenAuthorization.exclude_fields = exclude_fields
+	UserAuthorization.exclude_fields = exclude_fields
 
 
 def authorized_user(f):
