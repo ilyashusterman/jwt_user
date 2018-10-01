@@ -15,6 +15,7 @@ class UserAuthorization(object):
 		self.options = {
 			'exp':  datetime.utcnow() + DEFAULTS['JWT_EXPIRATION_DELTA'],
 		}
+		self.user_valid_fields = self.get_user_valid_fields()
 
 	def get_header_prefix(self):
 		return '{} '.format(DEFAULTS['JWT_AUTH_HEADER_PREFIX'])
@@ -53,8 +54,15 @@ class UserAuthorization(object):
 			raise Exception(msg)
 		return auth[1]
 
+	def request_is_valid(self, request):
+		return hasattr(request, 'headers') and \
+		       DEFAULTS['JWT_AUTH_HEADER'] in request.headers
+
 	def get_jwt_value(self, request):
-		return self.get_validated_token(request.headers[DEFAULTS['JWT_AUTH_HEADER']])
+		if self.request_is_valid(request):
+			return self.get_validated_token(request.headers[DEFAULTS['JWT_AUTH_HEADER']])
+		else:
+			raise Exception('Request not valid')
 
 	def get_checked_decoded(self, jwt_value):
 		try:
@@ -75,12 +83,12 @@ class UserAuthorization(object):
 	def authorize(self, request):
 		jwt_value = self.get_jwt_value(request)
 		if jwt_value is None:
-			return None
+			return None, None
 		jwt_decoded_payload = self.get_checked_decoded(jwt_value)
-		user_valid_fields = self.get_user_valid_fields()
-		if not set(jwt_decoded_payload.keys()).issubset(user_valid_fields):
-			msg = 'Invalid user attributes {}'.format(
-				set(jwt_decoded_payload.keys())-self.valid_user_fields)
+		if not set(jwt_decoded_payload.keys()).issubset(self.user_valid_fields):
+			invalid_attributes = \
+				set(jwt_decoded_payload.keys())-self.valid_user_fields
+			msg = 'Invalid user attributes {}'.format(invalid_attributes)
 			raise Exception(msg)
 		user = self.get_user_from_payload(jwt_decoded_payload)
 		return user, jwt_value

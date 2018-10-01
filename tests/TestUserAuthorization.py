@@ -4,7 +4,7 @@ from unittest import TestCase
 from bunch import Bunch
 
 from jwt_user import set_user_exclude_fields, get_jwt_user, \
-	set_user_valid_fields, authorized_user, generate_request
+	set_user_valid_fields, authorized_user, generate_request, Request
 from jwt_user.settings import DEFAULTS
 from jwt_user.UserAuthorization import UserAuthorization
 
@@ -56,6 +56,11 @@ class TestUserAuthorization(TestCase):
 		set_user_exclude_fields({'username'})
 		user = get_jwt_user(request)
 		self.assertNotIn('username', user.keys())
+
+	def test_unvalid_request(self):
+		request = Request()
+		with self.assertRaisesRegex(Exception, 'Request not valid'):
+			get_jwt_user(request)
 
 	def test_change_user_valid_fields(self):
 		test_field = 'test_field'
