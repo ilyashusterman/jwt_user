@@ -40,11 +40,11 @@ Usage
     ...         self.write('Hello, {}'.format(user.username))
     >>>
     >>> def make_app():
-    ...     user_valid_fields = {'username', 'user_id', 'test_field', 'token'}
+    ...     user_valid_fields = {'username', 'user_id', 'token'}
 	...     jwt_user.set_user_valid_fields(user_valid_fields)
 	...     application = tornado.web.Application([
     ...     (r'/', MainHandler),
-    ...     (r'/', MainUserHandler)])
+    ...     (r'/user_page', MainUserHandler)])
     ...     return application
     >>>
 ],
