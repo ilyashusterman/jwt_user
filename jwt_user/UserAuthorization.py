@@ -7,7 +7,7 @@ from jwt_user.settings import DEFAULTS, VALID_USER_FIELDS, EXCLUDE_USER_FIELDS
 
 
 class UserJSONWebTokenAuthorization(object):
-
+	DEFAULT_FIELDS = set('token')
 	valid_user_fields = VALID_USER_FIELDS
 	exclude_fields = EXCLUDE_USER_FIELDS
 
@@ -70,7 +70,7 @@ class UserJSONWebTokenAuthorization(object):
 			raise Exception()
 
 	def get_user_valid_fields(self):
-		return self.valid_user_fields.union(self.options.keys()).union(set('token'))
+		return self.valid_user_fields.union(self.options.keys()).union(self.DEFAULT_FIELDS)
 
 	def authorize(self, request):
 		jwt_value = self.get_jwt_value(request)
