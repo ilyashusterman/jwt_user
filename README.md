@@ -39,6 +39,11 @@ Usage
     ...         user = jwt_user.get_jwt_user(self.request)
     ...         self.write('Hello, {}'.format(user.username))
     >>>
+    >>> os.environ['JWT_EXPIRATION_DELTA'] = '3400'
+    >>> os.environ['JWT_PRIVATE_KEY'] = 'some random hexa private text'
+    >>> os.environ['JWT_SECRET_KEY'] = 'some random hexa secret text'
+    >>> os.environ['JWT_AUTH_HEADER'] = 'Authorization'
+    >>> os.environ['JWT_AUTH_HEADER_PREFIX'] = 'Bearer'
     >>> def make_app():
     ...     user_valid_fields = {'username', 'user_id', 'token'}
 	...     jwt_user.set_user_valid_fields(user_valid_fields)
